@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TODO List</title>
+</head>
+<body>
+    <div id="lista">
+
+    </div>
+    <form id="agregar" onsubmit="AgregarTarea(event)">
+        <input type="text" id="nombreTarea" placeholder="Ingrese la tarea a realizar">
+        <input type="date" id="fechaFinal" placeholder="Ponga el tiempo límite">
+        <input type="submit" value="Agregar Tarea">
+        <p id="mensajeError"></p>
+    </form>
+    <script src="script.js"></script>
+</body>
+</html>
