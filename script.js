@@ -1,49 +1,62 @@
 let listaTareas = [];
-const mensajeError = document.getElementById("mensajeError").value;
-const lista = document.getElementById("lista");
+let mensajeError = document.getElementById("mensajeError");
+let lista = document.getElementById("lista");
 
-const FechaHoy = () => {
-    const tiempoTranscurrido = Date.now();
-    const hoy = new Date(tiempoTranscurrido);
-    return hoy;
+const CompararFechas = (fechaSeleccionada) => {
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    const fecha = new Date(fechaSeleccionada);
+    fecha.setHours(0, 0, 0, 0);
+    return hoy.getTime() < fecha.getTime();
 }
 
-const Tarea = (texto, fechaFin) => {
+const FechaHoy = () => {
+    const hoy = new Date();
+    const año = hoy.getFullYear();
+    const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+    const dia = String(hoy.getDate()).padStart(2, '0');
+    return `${año}-${mes}-${dia}`;
+}
+
+function Tarea(texto, fechaFin) {
     this.texto = texto;
-    this.fechaFin = fechaFin.toDateString();
-    this.fechaCreacion = FechaHoy().toDateString();
+    this.fechaFin = fechaFin;
+    this.fechaCreacion = FechaHoy();
+    this.estaCompleto = false;
 }
 
 const AgregarTarea = (e) => {
+    e.preventDefault();
     console.log("Se ingresó a AT");
-    const nombreTarea = document.getElementById("nombreTarea").value;
-    const fechaFinal = document.getElementById("fechaFinal").value;
+    let nombreTarea = document.getElementById("nombreTarea").value;
+    let fechaFinal = document.getElementById("fechaFinal").value;
     if(HayNombre(nombreTarea) && FechaPosterior(fechaFinal))
     {
         console.log("Hay ambas");
-        listaTareas.push(Tarea(nombreTarea, fechaFinal));
-        listaTareas.forEach(tarea => {
-            console.log("Foreach");
-            lista.innerHTML += `<p>${tarea.texto}</p>`;
-            lista.innerHTML += `<p>${tarea.fechaFin}</p>`;
+        const todo = new Tarea(nombreTarea, fechaFinal);
+        listaTareas.push(todo);
+        lista.innerHTML = "";
+        listaTareas.forEach((tarea, index) => {
+            lista.innerHTML += `<input type="checkbox" id="checkbox-${index}" onclick="CambioDeSeleccion(${index})">`;
+            lista.innerHTML += `<p id="texto-${index}">${tarea.texto}</p>`;
+            lista.innerHTML += `<p id="fecha-${index}">Creada el ${tarea.fechaCreacion} - Completar antes del ${tarea.fechaFin}</p>`;
         });
+        document.getElementById("agregar").reset();
     }
     else if (!HayNombre(nombreTarea))
     {
         console.log("No hay nombre");
-        e.PreventDefault();
         mensajeError.innerText = "Se debe poner un nombre a la tarea";
     }
     else
     {
         console.log("No hay fecha correcta");
-        e.PreventDefault();
         mensajeError.innerText = "Se debe poner una fecha posterior a la actual";
     }
 }
 
 const HayNombre = (nombre) => {
-    if(nombre !== undefined)
+    if(nombre !== "")
     {
         return true;
     }
@@ -54,12 +67,30 @@ const HayNombre = (nombre) => {
 }
 
 const FechaPosterior = (fecha) =>{
-    if(fecha.toDateString() > FechaHoy().toDateString())
+    if(CompararFechas(fecha))
     {
         return true;
     }
     else
     {
         return false;
+    }
+}
+
+
+const CambioDeSeleccion = (index) => {
+    const textoTarea = document.getElementById(`texto-${index}`);
+    const checkbox = document.getElementById(`checkbox-${index}`);
+    const textoFecha = document.getElementById(`fecha-${index}`);
+    const fechaFin = listaTareas[index].fechaFin;
+    
+    if(checkbox.checked) {
+        textoTarea.style.textDecoration = 'line-through';
+        if(!CompararFechas(fechaFin))
+        {
+            textoFecha.style.color = 'red';
+        }
+    } else {
+        textoTarea.style.textDecoration = 'none';
     }
 }
