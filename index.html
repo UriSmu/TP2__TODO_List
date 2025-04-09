@@ -7,15 +7,18 @@
     <link href="style.css" rel="stylesheet">
 </head>
 <body>
-    <div id="lista">
+    <ul id="lista">
 
-    </div>
+    </ul>
     <form id="agregar" onsubmit="AgregarTarea(event)">
         <input type="text" id="nombreTarea" placeholder="Ingrese la tarea a realizar">
         <input type="date" id="fechaFinal" placeholder="Ponga el tiempo límite">
         <input type="submit" value="Agregar Tarea">
         <p id="mensajeError"></p>
     </form>
+    <div class="boton-container">
+        <button class="boton-ver-rapido" onclick="VerTodoMasRapido()">Ver TODO completado más rápido</button>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
