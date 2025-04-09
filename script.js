@@ -33,21 +33,10 @@ const AgregarTarea = (e) => {
     e.preventDefault();
     let nombreTarea = document.getElementById("nombreTarea").value;
     let fechaFinal = document.getElementById("fechaFinal").value;
-    if(HayNombre(nombreTarea) && FechaPosterior(fechaFinal)) {
+    if (HayNombre(nombreTarea) && FechaPosterior(fechaFinal)) {
         const todo = new Tarea(nombreTarea, fechaFinal);
         listaTareas.push(todo);
-        lista.innerHTML = "";
-        listaTareas.forEach((tarea, index) => {
-            lista.innerHTML += `
-                <li class="tarea">
-                    <input type="checkbox" id="checkbox-${index}" onclick="CambioDeSeleccion(${index})">
-                    <p id="texto-${index}">${tarea.texto}</p>
-                    <p id="fecha-${index}">Creada el ${tarea.fechaCreacion} - Completar antes del ${tarea.fechaFin}</p>
-                    <button class="boton-borrar" onclick="BorrarTarea(${index})">Borrar</button>
-                    <p id="completado-${index}"></p>
-                </li>
-            `;
-        });
+        renderizarListaTareas();
         document.getElementById("agregar").reset();
         mensajeError.innerText = "";
     } else if (!HayNombre(nombreTarea)) {
@@ -55,6 +44,26 @@ const AgregarTarea = (e) => {
     } else {
         mensajeError.innerText = "Se debe poner una fecha posterior a la actual";
     }
+}
+
+const BorrarTarea = (index) => {
+    listaTareas.splice(index, 1);
+    renderizarListaTareas();
+}
+
+const renderizarListaTareas = () => {
+    lista.innerHTML = "";
+    listaTareas.forEach((tarea, index) => {
+        lista.innerHTML += `
+            <li class="tarea">
+                <input type="checkbox" id="checkbox-${index}" ${tarea.estaCompleto ? 'checked' : ''} onclick="CambioDeSeleccion(${index})">
+                <p id="texto-${index}" style="text-decoration: ${tarea.estaCompleto ? 'line-through' : 'none'}">${tarea.texto}</p>
+                <p id="fecha-${index}">Creada el ${tarea.fechaCreacion} - Completar antes del ${tarea.fechaFin}</p>
+                <button class="boton-borrar" onclick="BorrarTarea(${index})">Borrar</button>
+                <p id="completado-${index}">${tarea.estaCompleto ? `Completada en ${tarea.tiempoTranscurrido}` : ''}</p>
+            </li>
+        `;
+    });
 }
 
 const HayNombre = (nombre) => {
@@ -89,6 +98,7 @@ const CambioDeSeleccion = (index) => {
         textoTarea.style.textDecoration = 'none';
         textoFecha.style.color = 'initial';
         completadoTexto.innerText = '';
+        listaTareas[index].estaCompleto = false;
     }
 }
 
@@ -99,23 +109,6 @@ const calcularTiempoTranscurrido = (fechaCreacion, fechaCompletado) => {
     const minutos = Math.floor((diferencia % 3600000) / 60000);
     return `${horas} horas y ${minutos} minutos`;
 }
-
-const BorrarTarea = (index) => {
-    listaTareas.splice(index, 1);
-    lista.innerHTML = "";
-    listaTareas.forEach((tarea, index) => {
-        lista.innerHTML += `
-            <li class="tarea">
-                <input type="checkbox" id="checkbox-${index}" onclick="CambioDeSeleccion(${index})">
-                <p id="texto-${index}">${tarea.texto}</p>
-                <p id="fecha-${index}">Creada el ${tarea.fechaCreacion} - Completar antes del ${tarea.fechaFin}</p>
-                <button class="boton-borrar" onclick="BorrarTarea(${index})">Borrar</button>
-                <p id="completado-${index}"></p>
-            </li>
-        `;
-    });
-}
-
 
 const VerTodoMasRapido = () => {
     const tareaMasRapida = listaTareas.filter(tarea => tarea.estaCompleto).sort((a, b) => a.tiempoTranscurrido - b.tiempoTranscurrido)[0];
